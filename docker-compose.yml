@@ -1,16 +1,18 @@
 elasticsearch:
   image: elasticsearch:latest
-  command: elasticsearch -Des.network.host=0.0.0.0
+  command: elasticsearch -Dhttp.max_content_length=512M -Des.network.host=0.0.0.0
   ports:
     - "9200:9200"
     - "9300:9300"
 logstash:
-  image: logstash:latest
-  command: logstash -f /etc/logstash/conf.d/logstash.conf
+#  image: logstash:latest
+  build: logstash/
   volumes:
     - ./logstash/config:/etc/logstash/conf.d
+  #command: logstash -f /etc/logstash/conf.d/logstash.conf
+  command: bash -c "LS_HEAP_SIZE=2048m logstash -f /etc/logstash/conf.d/logstash.conf"
   ports:
-    - "5000:5000"
+    - "8000:8000"
   links:
     - elasticsearch
 kibana:
